@@ -7,125 +7,209 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+    :root {
+      --sidebar-width: 60px;
+      --sidebar-expanded: 200px;
+      --primary-dark: #2c3e50;
+      --accent-blue: #3498db;
+    }
+
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 0; color: #333; display: flex; min-height: 100vh; }
     
+    /* Sidebar Styling */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--primary-dark);
+      color: white;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      transition: width 0.3s ease;
+      overflow: hidden;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    }
+
+    .sidebar:hover { width: var(--sidebar-expanded); }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 18px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+      border-left: 4px solid transparent;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,0.1); }
+    .nav-item.active { background: rgba(255,255,255,0.15); border-left-color: var(--accent-blue); }
+
+    .nav-item i { min-width: 24px; margin-right: 20px; }
+    .nav-text { opacity: 0; transition: opacity 0.3s; font-weight: 500; }
+    .sidebar:hover .nav-text { opacity: 1; }
+
+    /* Main Content Area */
+    .content-wrapper { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; }
+
     header { 
-      background: #2c3e50; color: white; padding: 20px; border-radius: 8px; 
-      margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      background: white; color: var(--primary-dark); padding: 15px 30px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
     }
     
-    .header-left h1 { margin: 0; font-size: 1.6rem; }
-    .header-left #header-ts { font-size: 1.1rem; color: #3498db; margin-top: 5px; font-weight: bold; }
+    .header-left { display: flex; align-items: center; gap: 20px; }
+    .logo { height: 50px; width: auto; }
+    .header-titles h1 { margin: 0; font-size: 1.4rem; color: var(--primary-dark); }
+    #header-ts { font-size: 1rem; color: var(--accent-blue); font-weight: bold; }
     
-    .header-right { text-align: right; }
-    
-    .status-icons { display: flex; gap: 15px; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; margin-bottom: 10px; }
-    .status-icon { display: flex; align-items: center; gap: 5px; color: #bdc3c7; font-size: 0.8rem; }
-    .status-icon.active { color: #f1c40f; } /* Default active color */
+    .status-icons { display: flex; gap: 10px; background: #f8f9fa; padding: 8px 15px; border-radius: 8px; border: 1px solid #eee; }
+    .status-icon { display: flex; align-items: center; gap: 5px; color: #bdc3c7; font-size: 0.75rem; font-weight: 600; }
+    .status-icon.active { color: #555; }
     .status-icon.active.hot { color: #e67e22; }
     .status-icon.active.rain { color: #3498db; }
     .status-icon.active.battery { color: #2ecc71; }
 
     .btn-export {
       background: #27ae60; color: white; text-decoration: none; padding: 8px 15px; 
-      border-radius: 4px; font-weight: bold; font-size: 0.8rem; transition: background 0.2s;
-      display: inline-block;
+      border-radius: 4px; font-weight: bold; font-size: 0.75rem; transition: background 0.2s;
     }
-    .btn-export:hover { background: #219150; }
 
-    .main-container { max-width: 1400px; margin: auto; }
-    h2 { border-left: 5px solid #3498db; padding-left: 10px; margin-top: 30px; }
-
-    .data-grid-30 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-    .data-box { 
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; 
-      padding: 15px; text-align: center; transition: transform 0.2s; position: relative;
-    }
-    .data-label { font-size: 0.75rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-    .data-value { font-size: 1.4rem; color: #2c3e50; font-weight: bold; }
-
-    /* Wind Rose Styling */
-    .wind-rose-container { width: 60px; height: 60px; margin: 10px auto; position: relative; border: 2px solid #eee; border-radius: 50%; }
-    .wind-arrow {
-      position: absolute; top: 50%; left: 50%; width: 4px; height: 30px;
-      background: #e74c3c; margin-left: -2px; margin-top: -25px;
-      transform-origin: bottom center; transition: transform 1s ease-in-out;
-    }
-    .wind-arrow::after { content: ''; position: absolute; top: 0; left: -4px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #e74c3c; }
-    .rose-label { position: absolute; font-size: 10px; font-weight: bold; width: 100%; text-align: center; }
-    .rose-n { top: -2px; }
-
-    .images-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
-    @media (max-width: 768px) { .images-grid { grid-template-columns: 1fr; } .header-right { text-align: left; margin-top: 15px; } }
+    .main-container { padding: 30px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
     
-    .img-container { aspect-ratio: 16 / 9; background: #222; border-radius: 8px; overflow: hidden; position: relative; border: 3px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .img-container img { width: 100%; height: 100%; object-fit: cover; }
-    .img-label { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 10px; font-size: 0.8rem; border-radius: 4px; }
+    /* View Visibility */
+    .view-section { display: none; }
+    .view-section.active { display: block; animation: fadeIn 0.4s ease; }
 
-    .charts-container { margin-top: 30px; }
-    .chart-box { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Grid & Boxes */
+    .data-grid-30 { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+    .data-box { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .data-label { font-size: 0.7rem; color: #7f8c8d; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; }
+    .data-value { font-size: 1.5rem; color: var(--primary-dark); font-weight: bold; }
+
+    /* Wind Rose */
+    .wind-rose-container { width: 60px; height: 60px; margin: 10px auto; position: relative; border: 2px solid #f0f0f0; border-radius: 50%; }
+    .wind-arrow { position: absolute; top: 50%; left: 50%; width: 3px; height: 30px; background: #e74c3c; margin-left: -1.5px; margin-top: -25px; transform-origin: bottom center; transition: transform 1s ease-in-out; }
+    .wind-arrow::after { content: ''; position: absolute; top: 0; left: -4.5px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #e74c3c; }
+
+    .images-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .img-container { aspect-ratio: 16 / 9; background: #222; border-radius: 12px; overflow: hidden; position: relative; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .img-container img { width: 100%; height: 100%; object-fit: cover; }
+    .img-label { position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.7); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 6px; }
+
+    .chart-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .chart-box h3 { margin-top: 0; color: var(--primary-dark); font-size: 1.1rem; border-bottom: 2px solid #f4f7f6; padding-bottom: 10px; }
     .chart-box canvas { width: 100% !important; height: 350px !important; }
 
-    #status { font-size: 0.8rem; color: #bdc3c7; margin-top: 10px; }
+    #status { font-size: 0.75rem; color: #95a5a6; margin-top: 5px; }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 0; }
+      .sidebar:hover { width: var(--sidebar-expanded); }
+      .content-wrapper { margin-left: 0; }
+      header { padding: 15px; }
+      .images-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-left">
-      <h1>SBMA AWOS Live Weather (C600 Bridge)</h1>
-      <div id="header-ts">Loading Manila Time...</div>
-      <div id="status">Status: Initializing...</div>
+  <nav class="sidebar">
+    <div style="height: 80px;"></div> <div class="nav-item active" onclick="showView('latest', this)">
+      <i data-lucide="layout-dashboard"></i>
+      <span class="nav-text">Latest Conditions</span>
     </div>
-    
-    <div class="header-right">
-      <div class="status-icons">
-        <div class="status-icon" id="icon-hot" title="Heat Index > 30°C"><i data-lucide="thermometer-sun"></i> Hot</div>
-        <div class="status-icon" id="icon-rain" title="Raining"><i data-lucide="cloud-rain"></i> Rain</div>
-        <div class="status-icon" id="icon-lightning" title="Lightning Detected"><i data-lucide="zap"></i> Lightning</div>
-        <div class="status-icon" id="icon-cloud" title="Cloud Cover"><i data-lucide="cloud"></i> Cloudy</div>
-        <div class="status-icon" id="icon-battery" title="Battery > 5V"><i data-lucide="battery-full"></i> Power</div>
+    <div class="nav-item" onclick="showView('cameras', this)">
+      <i data-lucide="camera"></i>
+      <span class="nav-text">Live Feeds</span>
+    </div>
+    <div class="nav-item" onclick="showView('trends', this)">
+      <i data-lucide="line-chart"></i>
+      <span class="nav-text">Weather Trends</span>
+    </div>
+  </nav>
+
+  <div class="content-wrapper">
+    <header>
+      <div class="header-left">
+        <img src="https://westpointengineering.com.ph/wp-content/uploads/2023/02/wpesi-logo2xE.png" alt="WestPoint Logo" class="logo">
+        <div class="header-titles">
+          <h1>SBMA AWOS Live Weather</h1>
+          <div id="header-ts">Loading Manila Time...</div>
+          <div id="status">Status: Initializing...</div>
+        </div>
       </div>
-      <a href="https://docs.google.com/spreadsheets/d/10ouuSW_pnOnqJM7N-5eNKyhFIeG4VKiNM8ggdb5PIe4/export?format=csv" class="btn-export" target="_blank">EXPORT CSV</a>
+      
+      <div class="header-right" style="display: flex; align-items: center; gap: 20px;">
+        <div class="status-icons">
+          <div class="status-icon" id="icon-hot" title="Heat Index > 30°C"><i data-lucide="thermometer-sun"></i> Hot</div>
+          <div class="status-icon" id="icon-rain" title="Raining"><i data-lucide="cloud-rain"></i> Rain</div>
+          <div class="status-icon" id="icon-lightning" title="Lightning Detected"><i data-lucide="zap"></i> Lightning</div>
+          <div class="status-icon" id="icon-cloud" title="Cloud Cover"><i data-lucide="cloud"></i> Cloudy</div>
+          <div class="status-icon" id="icon-battery" title="Battery > 5V"><i data-lucide="battery-full"></i> Power</div>
+        </div>
+        <a href="https://docs.google.com/spreadsheets/d/10ouuSW_pnOnqJM7N-5eNKyhFIeG4VKiNM8ggdb5PIe4/export?format=csv" class="btn-export" target="_blank">EXPORT CSV</a>
+      </div>
+    </header>
+
+    <div class="main-container">
+      
+      <section id="latest" class="view-section active">
+        <h2>Latest Conditions</h2>
+        <div id="data-grid" class="data-grid-30"></div>
+      </section>
+
+      <section id="cameras" class="view-section">
+        <h2>Live Camera Feeds</h2>
+        <div class="images-grid">
+          <div class="img-container"><img id="img-cam1" alt="Cam 1"><div class="img-label">Station View 1</div></div>
+          <div class="img-container"><img id="img-cam2" alt="Cam 2"><div class="img-label">Station View 2</div></div>
+          <div class="img-container"><img id="img-cam3" alt="Cam 3"><div class="img-label">Station View 3</div></div>
+          <div class="img-container"><img id="img-cam4" alt="Cam 4"><div class="img-label">Station View 4</div></div>
+        </div>
+      </section>
+
+      <section id="trends" class="view-section">
+        <h2>Weather Trends (24 Hours)</h2>
+        <div id="charts-container" class="charts-container"></div>
+      </section>
+
     </div>
-  </header>
-
-  <div class="main-container">
-    <h2>Latest Conditions</h2>
-    <div id="data-grid" class="data-grid-30"></div>
-
-    <h2>Live Camera Feeds</h2>
-    <div class="images-grid">
-      <div class="img-container"><img id="img-cam1" alt="Cam 1"><div class="img-label">Station View 1</div></div>
-      <div class="img-container"><img id="img-cam2" alt="Cam 2"><div class="img-label">Station View 2</div></div>
-      <div class="img-container"><img id="img-cam3" alt="Cam 3"><div class="img-label">Station View 3</div></div>
-      <div class="img-container"><img id="img-cam4" alt="Cam 4"><div class="img-label">Station View 4</div></div>
-    </div>
-
-    <h2>Weather Trends (Last 24 Hours - Manila Time)</h2>
-    <div id="charts-container" class="charts-container"></div>
   </div>
 
   <script>
+    // Navigation Logic
+    function showView(viewId, el) {
+      // Toggle Section
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      
+      // Toggle Sidebar UI
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      el.classList.add('active');
+
+      // Refresh Charts if Trends is clicked (helps with resizing)
+      if(viewId === 'trends') window.dispatchEvent(new Event('resize'));
+    }
+
     const sheetId = "10ouuSW_pnOnqJM7N-5eNKyhFIeG4VKiNM8ggdb5PIe4";
     const feedUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-    // Initialize Lucide Icons
     lucide.createIcons();
 
-    // Helper: Convert UTC string from Sheet to Manila Time (UTC+8)
     function toManilaTime(utcString) {
       if (!utcString || utcString === '--') return '--';
       try {
-        const date = new Date(utcString + " UTC"); // Interpret input as UTC
+        const date = new Date(utcString + " UTC");
         if (isNaN(date.getTime())) return utcString;
-        
         return date.toLocaleString('en-ZA', { 
-          timeZone: 'Asia/Manila',
-          year: 'numeric', month: '2-digit', day: '2-digit',
-          hour: '2-digit', minute: '2-digit', second: '2-digit',
-          hour12: false
+          timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
         }).replace(/\//g, '-').replace(',', '');
       } catch (e) { return utcString; }
     }
@@ -150,13 +234,10 @@
         const headers = json.table.cols.map(c => c.label);
         const latestRow = rows[rows.length - 1].c;
 
-        // 1. Update Header Timestamp (Manila Time)
         const tsIdx = headers.indexOf("Timestamp (UTC)");
         const rawTs = latestRow[tsIdx]?.f || latestRow[tsIdx]?.v || '--';
-        const manilaTs = toManilaTime(rawTs);
-        document.getElementById('header-ts').innerText = manilaTs;
+        document.getElementById('header-ts').innerText = toManilaTime(rawTs);
 
-        // 2. Process Data Grid and Icons
         const grid = document.getElementById('data-grid');
         grid.innerHTML = '';
         
@@ -164,11 +245,9 @@
 
         headers.forEach((h, i) => {
           if (!h || h.toLowerCase().includes("timestamp") || h.toLowerCase().startsWith("image")) return;
-          
           const val = latestRow[i] ? (latestRow[i].v) : 0;
           const displayVal = latestRow[i] ? (latestRow[i].f || latestRow[i].v) : '--';
           
-          // Track values for status icons
           if (h.includes("Heat Index")) heatIndex = parseFloat(val);
           if (h.includes("Precip")) rainRate = parseFloat(val);
           if (h.includes("Voltage")) voltage = parseFloat(val);
@@ -179,41 +258,29 @@
           box.className = 'data-box';
           
           if (h.includes("Wind Dir")) {
-            box.innerHTML = `
-              <div class="data-label">${h}</div>
-              <div class="wind-rose-container">
-                <div class="rose-label rose-n">N</div>
-                <div class="wind-arrow" style="transform: translate(-50%, 0) rotate(${windDir}deg)"></div>
-              </div>
-              <div class="data-value">${displayVal}°</div>`;
+            box.innerHTML = `<div class="data-label">${h}</div><div class="wind-rose-container"><div class="wind-arrow" style="transform: translate(-50%, 0) rotate(${windDir}deg)"></div></div><div class="data-value">${displayVal}°</div>`;
           } else {
             box.innerHTML = `<div class="data-label">${h}</div><div class="data-value">${displayVal}</div>`;
           }
           grid.appendChild(box);
         });
 
-        // 3. Update Status Icons logic
         const toggleIcon = (id, active, className) => {
           const el = document.getElementById(id);
           if(active) { el.classList.add('active'); if(className) el.classList.add(className); }
-          else { el.classList.remove('active'); }
+          else { el.classList.remove('active'); el.classList.remove(className); }
         };
 
         toggleIcon('icon-hot', heatIndex > 30, 'hot');
         toggleIcon('icon-rain', rainRate > 0, 'rain');
         toggleIcon('icon-battery', voltage > 5.0, 'battery');
         toggleIcon('icon-cloud', solar < 200 && (new Date().getHours() > 6 && new Date().getHours() < 18), null);
-        // Note: Lightning logic depends on your specific sensor column name, assuming 'Lightning' exists
-        const lightningIdx = headers.findIndex(h => h.toLowerCase().includes("lightning"));
-        if(lightningIdx !== -1) toggleIcon('icon-lightning', parseFloat(latestRow[lightningIdx]?.v || 0) > 0);
-
-        // 4. Update Images
+        
         ['Image_Cam1', 'Image_Cam2', 'Image_Cam3', 'Image_Cam4'].forEach((id, index) => {
           const colIdx = headers.indexOf(id);
           if (colIdx !== -1) document.getElementById(`img-cam${index+1}`).src = processImageUrl(latestRow[colIdx]?.v || '');
         });
 
-        // 5. Build Charts with Manila Time Labels
         const chartsContainer = document.getElementById('charts-container');
         chartsContainer.innerHTML = '';
 
@@ -222,7 +289,7 @@
           const labels = lastData.map(r => {
             const timeStr = r.c[tsIdx]?.f || r.c[tsIdx]?.v || '';
             const mTime = toManilaTime(timeStr);
-            return mTime !== '--' ? mTime.split(' ')[1] : ''; // Show only HH:MM:SS on X-axis
+            return mTime !== '--' ? mTime.split(' ')[1] : '';
           });
 
           let datasets = [];
@@ -231,8 +298,7 @@
           fieldList.forEach((fieldName) => {
             const colIdx = headers.indexOf(fieldName);
             if (colIdx === -1) return;
-            const match = fieldName.match(/\(([^)]+)\)/);
-            const unit = match ? match[1] : 'val';
+            const unit = (fieldName.match(/\(([^)]+)\)/) || [null, 'val'])[1];
             if (!seenUnits.includes(unit)) seenUnits.push(unit);
             const isSecondAxis = seenUnits.indexOf(unit) > 0;
 
@@ -240,10 +306,7 @@
               label: fieldName,
               data: lastData.map(r => r.c[colIdx]?.v || null),
               borderColor: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'][datasets.length % 5],
-              backgroundColor: 'transparent',
-              borderWidth: 2,
-              pointRadius: 0,
-              tension: 0.3,
+              backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: 0.3,
               yAxisID: isSecondAxis ? 'y1' : 'y'
             });
           });
@@ -259,11 +322,10 @@
             data: { labels, datasets },
             options: {
               responsive: true, maintainAspectRatio: false,
-              interaction: { mode: 'index', intersect: false },
               scales: {
-                x: { ticks: { maxTicksLimit: 12, font: { size: 10 } } },
-                y: { type: 'linear', display: true, position: 'left', title: { display: true, text: seenUnits[0] || '' } },
-                y1: { type: 'linear', display: seenUnits.length > 1, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: seenUnits[1] || '' } }
+                x: { ticks: { maxTicksLimit: 12 } },
+                y: { type: 'linear', position: 'left', title: { display: true, text: seenUnits[0] } },
+                y1: { type: 'linear', display: seenUnits.length > 1, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: seenUnits[1] } }
               }
             }
           });
@@ -277,36 +339,12 @@
 
         statusEl.innerText = "Status: Live (Refreshing every 5 mins)";
       } catch (error) {
-        console.error("Dashboard Error:", error);
         statusEl.innerText = "Status: Error updating data.";
       }
     }
 
     fetchWeatherData();
     setInterval(fetchWeatherData, 300000);
-// Revisions
-// - Show all 30 latest data values in a grid (excluding timestamp and camera image columns).
-// - Display the 4 camera images separately.
-// - Generate 24 hour charts for each of the 30 fields, excluding timestamp and camera images.
-
-// charts: 
-// Chart 1 - Data: a. Wind Speed b. Max Wind Speed c. Wind Chill 
-// Chart 2- Data: a. Precip b. Relative Humidity 
-// Chart 3 - Data: a. Temp b. Dew Point c. Relative Humidity d. Heat Index 
-// Chart 4 - Data: a. Altimeter b. Elevation c. Station Pressure d. Pressure Alt e. Density Alt 
-// Chart 5 - Data: Voltage. Where the units are the same use a common axis and scale. 
-// Where the units are different, use another axis and scale.
-
-// 1. all the times (currently are in UTC) to be in Manila Time (+8 UTC)  
-// 2. there is a group of icons that show at the top in the banner, when: 
-//  a. it is hot (above 30 heat index), 
-//  b. there is lightning, 
-//  c. there is rain, 
-//  d. there is cloud cover, 
-//  e. battery is good (above 5 VDC), 
-// 3. a wind rose, showing wind direction visually against a compass inside the Wind Dir box of the data grid 
-// 4. a small button at the banner at the top labelled "EXPORT CSV" with a link to google sheets for CSV download. 
-// 5. At the top, in the banner, it says "SBMA AWOS Live Weather (C600 Bridge)" Time stamp of the latest data in YYYY-MM-DD HH:MM:SS format, at +8GMT not in UTC.
   </script>
 </body>
 </html>
