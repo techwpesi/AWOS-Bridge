@@ -12,234 +12,359 @@
       --sidebar-expanded: 220px;
       --primary-dark: #2c3e50;
       --accent-blue: #3498db;
+      --header-height: 80px;
     }
 
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 0; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
     
     /* Desktop Sidebar */
     .sidebar {
-      width: var(--sidebar-width); background: var(--primary-dark); color: white; height: 100vh;
-      position: fixed; left: 0; top: 0; transition: width 0.3s ease; overflow: hidden; z-index: 1000;
-      display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      width: var(--sidebar-width);
+      background: var(--primary-dark);
+      color: white;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     }
+
     .sidebar:hover { width: var(--sidebar-expanded); }
-    .nav-item { display: flex; align-items: center; padding: 18px 23px; cursor: pointer; transition: all 0.2s; white-space: nowrap; border-left: 4px solid transparent; color: #bdc3c7; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 18px 23px; /* Centers the icon in the 70px bar */
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      border-left: 4px solid transparent;
+      color: #bdc3c7;
+    }
+
     .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
     .nav-item.active { background: rgba(255,255,255,0.15); border-left-color: var(--accent-blue); color: white; }
+
     .nav-item i { min-width: 24px; margin-right: 25px; }
     .nav-text { opacity: 0; transition: opacity 0.2s; font-weight: 500; }
     .sidebar:hover .nav-text { opacity: 1; }
 
-    /* Main Content */
+    /* Main Content Wrapper */
     .content-wrapper { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; }
 
     header { 
       background: white; color: var(--primary-dark); padding: 10px 30px; 
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; 
-      align-items: center; position: sticky; top: 0; z-index: 900;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: flex; justify-content: space-between; align-items: center; 
+      position: sticky; top: 0; z-index: 900;
     }
     
-    .logo { height: 50px; width: auto; transition: transform 0.2s; }
-    .logo:hover { transform: scale(1.02); }
-    .header-titles h1 { margin: 0; font-size: 1.2rem; }
+    .header-left { display: flex; align-items: center; gap: 20px; }
+    .logo-link { display: flex; align-items: center; transition: opacity 0.2s; }
+    .logo-link:hover { opacity: 0.8; }
+    .logo { height: 50px; width: auto; }
+    
+    .header-titles h1 { margin: 0; font-size: 1.2rem; color: var(--primary-dark); }
     #header-ts { font-size: 0.9rem; color: var(--accent-blue); font-weight: bold; }
     
-    .status-icons { display: flex; gap: 12px; background: #f8f9fa; padding: 8px 12px; border-radius: 8px; border: 1px solid #eee; }
-    .status-icon { display: flex; align-items: center; gap: 5px; color: #ccc; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+    .status-icons { display: flex; gap: 12px; background: #f8f9fa; padding: 10px 15px; border-radius: 10px; border: 1px solid #eee; }
+    .status-icon { display: flex; align-items: center; gap: 6px; color: #ccc; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
     .status-icon.active { color: #555; }
     .status-icon.active.hot { color: #e67e22; }
     .status-icon.active.rain { color: #3498db; }
     .status-icon.active.battery { color: #2ecc71; }
 
-    .btn-export { background: #27ae60; color: white; text-decoration: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; font-size: 0.7rem; }
+    .btn-export { background: #27ae60; color: white; text-decoration: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; }
 
-    .main-container { padding: 20px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+    .main-container { padding: 25px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
     .view-section { display: none; }
     .view-section.active { display: block; animation: fadeIn 0.3s ease; }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .data-grid-30 { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-    .data-box { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; text-align: center; }
-    .data-label { font-size: 0.65rem; color: #95a5a6; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
-    .data-value { font-size: 1.3rem; color: var(--primary-dark); font-weight: 800; }
+    /* Data Presentation */
+    .data-grid-30 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+    .data-box { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: center; }
+    .data-label { font-size: 0.65rem; color: #95a5a6; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
+    .data-value { font-size: 1.4rem; color: var(--primary-dark); font-weight: 800; }
 
-    .images-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-    .img-container { aspect-ratio: 16 / 9; background: #000; border-radius: 10px; overflow: hidden; position: relative; }
+    .wind-rose-container { width: 50px; height: 50px; margin: 10px auto; position: relative; border: 2px solid #f0f0f0; border-radius: 50%; }
+    .wind-arrow { position: absolute; top: 50%; left: 50%; width: 3px; height: 25px; background: #e74c3c; margin-left: -1.5px; margin-top: -20px; transform-origin: bottom center; transition: transform 1s; }
+    .wind-arrow::after { content: ''; position: absolute; top: 0; left: -4.5px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #e74c3c; }
+
+    .images-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .img-container { aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; position: relative; }
     .img-container img { width: 100%; height: 100%; object-fit: cover; }
+    .img-label { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 12px; font-size: 0.75rem; border-radius: 4px; }
 
-    .chart-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+    .chart-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
 
-    /* Mobile Bottom Nav */
-    .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--primary-dark); z-index: 1001; grid-template-columns: repeat(3, 1fr); }
-    .mobile-nav .nav-item { flex-direction: column; padding: 10px 0; border-left: none; }
-    .mobile-nav .nav-item i { margin-right: 0; margin-bottom: 4px; }
-    .mobile-nav .nav-item .nav-text { opacity: 1; font-size: 0.6rem; }
+    /* Mobile Navigation Bar */
+    .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--primary-dark); z-index: 1001; grid-template-columns: repeat(3, 1fr); box-shadow: 0 -2px 10px rgba(0,0,0,0.2); }
+    .mobile-nav .nav-item { flex-direction: column; padding: 12px 0; border-left: none; border-top: 3px solid transparent; }
+    .mobile-nav .nav-item i { margin-right: 0; margin-bottom: 5px; }
+    .mobile-nav .nav-item .nav-text { opacity: 1; font-size: 0.65rem; }
+    .mobile-nav .nav-item.active { border-top-color: var(--accent-blue); background: none; }
 
-    /* MOBILE & LANDSCAPE LOGIC */
+    /* Mobile Responsive Tweaks */
     @media (max-width: 850px) {
       .sidebar { display: none; }
       .mobile-nav { display: grid; }
-      .content-wrapper { margin-left: 0; margin-bottom: 60px; }
-      
-      /* Auto-hide banner in Mobile Landscape */
-      @media (orientation: landscape) {
-        header { display: none; }
-        .main-container { padding: 10px; }
-      }
+      .content-wrapper { margin-left: 0; margin-bottom: 70px; }
+      header { flex-direction: column; gap: 15px; padding: 15px; text-align: center; }
+      .header-right { flex-direction: column; width: 100%; }
+      .status-icons { flex-wrap: wrap; justify-content: center; }
+      .images-grid { grid-template-columns: 1fr; }
+      .logo { height: 40px; }
     }
   </style>
 </head>
 <body>
 
   <nav class="sidebar">
-    <div style="height: 80px;"></div>
-    <div class="nav-item active" onclick="showView('latest', this)"><i data-lucide="layout-dashboard"></i><span class="nav-text">Latest Conditions</span></div>
-    <div class="nav-item" onclick="showView('cameras', this)"><i data-lucide="camera"></i><span class="nav-text">Live Feeds</span></div>
-    <div class="nav-item" onclick="showView('trends', this)"><i data-lucide="line-chart"></i><span class="nav-text">Weather Trends</span></div>
+    <div style="height: 100px;"></div>
+    <div class="nav-item active" onclick="showView('latest', this)">
+      <i data-lucide="layout-dashboard"></i>
+      <span class="nav-text">Latest Conditions</span>
+    </div>
+    <div class="nav-item" onclick="showView('cameras', this)">
+      <i data-lucide="camera"></i>
+      <span class="nav-text">Live Feeds</span>
+    </div>
+    <div class="nav-item" onclick="showView('trends', this)">
+      <i data-lucide="line-chart"></i>
+      <span class="nav-text">Weather Trends</span>
+    </div>
   </nav>
 
   <nav class="mobile-nav">
-    <div class="nav-item active" onclick="showView('latest', this)"><i data-lucide="layout-dashboard"></i><span class="nav-text">Latest</span></div>
-    <div class="nav-item" onclick="showView('cameras', this)"><i data-lucide="camera"></i><span class="nav-text">Cameras</span></div>
-    <div class="nav-item" onclick="showView('trends', this)"><i data-lucide="line-chart"></i><span class="nav-text">Trends</span></div>
+    <div class="nav-item active" onclick="showView('latest', this)">
+      <i data-lucide="layout-dashboard"></i>
+      <span class="nav-text">Latest</span>
+    </div>
+    <div class="nav-item" onclick="showView('cameras', this)">
+      <i data-lucide="camera"></i>
+      <span class="nav-text">Cameras</span>
+    </div>
+    <div class="nav-item" onclick="showView('trends', this)">
+      <i data-lucide="line-chart"></i>
+      <span class="nav-text">Trends</span>
+    </div>
   </nav>
 
   <div class="content-wrapper">
     <header>
       <div class="header-left">
-        <a href="https://westpointengineering.com.ph/" target="_blank">
-          <img src="https://westpointengineering.com.ph/wp-content/uploads/2023/02/wpesi-logo2xE.png" alt="WestPoint" class="logo">
+        <a href="https://westpointengineering.com.ph/" target="_blank" class="logo-link">
+            <img src="https://westpointengineering.com.ph/wp-content/uploads/2023/02/wpesi-logo2xE.png" alt="WestPoint Logo" class="logo">
         </a>
         <div class="header-titles">
-          <h1>SBMA AWOS Live</h1>
-          <div id="header-ts">Loading...</div>
+          <h1>SBMA AWOS Live Weather</h1>
+          <div id="header-ts">Loading Manila Time...</div>
+          <div id="status" style="font-size: 0.7rem; color: #999;">Initializing...</div>
         </div>
       </div>
-      <div class="status-icons">
-        <div class="status-icon" id="icon-hot"><i data-lucide="thermometer-sun"></i> Hot</div>
-        <div class="status-icon" id="icon-rain"><i data-lucide="cloud-rain"></i> Rain</div>
-        <div class="status-icon" id="icon-lightning"><i data-lucide="zap"></i> Bolt</div>
-        <div class="status-icon" id="icon-battery"><i data-lucide="battery-full"></i> Pwr</div>
+      
+      <div class="header-right" style="display: flex; align-items: center; gap: 15px;">
+        <div class="status-icons">
+          <div class="status-icon" id="icon-hot" title="Heat Index > 30°C"><i data-lucide="thermometer-sun"></i> Hot</div>
+          <div class="status-icon" id="icon-rain" title="Raining"><i data-lucide="cloud-rain"></i> Rain</div>
+          <div class="status-icon" id="icon-lightning" title="Lightning"><i data-lucide="zap"></i> Lightng</div>
+          <div class="status-icon" id="icon-cloud" title="Cloud Cover"><i data-lucide="cloud"></i> Cloud</div>
+          <div class="status-icon" id="icon-battery" title="Battery > 5V"><i data-lucide="battery-full"></i> Power</div>
+        </div>
+        <a href="https://docs.google.com/spreadsheets/d/10ouuSW_pnOnqJM7N-5eNKyhFIeG4VKiNM8ggdb5PIe4/export?format=csv" class="btn-export" target="_blank">EXPORT CSV</a>
       </div>
-      <a href="https://docs.google.com/spreadsheets/d/10ouuSW_pnOnqJM7N-5eNKyhFIeG4VKiNM8ggdb5PIe4/export?format=csv" class="btn-export">CSV</a>
     </header>
 
     <div class="main-container">
-      <section id="latest" class="view-section active"><div id="data-grid" class="data-grid-30"></div></section>
+      
+      <section id="latest" class="view-section active">
+        <div id="data-grid" class="data-grid-30"></div>
+      </section>
+
       <section id="cameras" class="view-section">
         <div class="images-grid">
-          <div class="img-container"><img id="img-cam1"><div style="position:absolute; bottom:5px; left:5px; color:white; font-size:10px; background:rgba(0,0,0,0.5); padding:2px 5px;">View 1</div></div>
-          <div class="img-container"><img id="img-cam2"></div>
-          <div class="img-container"><img id="img-cam3"></div>
-          <div class="img-container"><img id="img-cam4"></div>
+          <div class="img-container"><img id="img-cam1" alt="Cam 1"><div class="img-label">Station View 1</div></div>
+          <div class="img-container"><img id="img-cam2" alt="Cam 2"><div class="img-label">Station View 2</div></div>
+          <div class="img-container"><img id="img-cam3" alt="Cam 3"><div class="img-label">Station View 3</div></div>
+          <div class="img-container"><img id="img-cam4" alt="Cam 4"><div class="img-label">Station View 4</div></div>
         </div>
       </section>
-      <section id="trends" class="view-section"><div id="charts-container"></div></section>
+
+      <section id="trends" class="view-section">
+        <div id="charts-container" class="charts-container"></div>
+      </section>
+
     </div>
   </div>
 
   <script>
     function showView(viewId, el) {
-      document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      
+      // Sync active state for both Mobile and Desktop navs
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      
+      // Find all instances of this nav link (one in sidebar, one in mobile-nav)
       const label = el.querySelector('.nav-text').innerText;
-      document.querySelectorAll('.nav-item').forEach(i => { if(i.innerText.includes(label)) i.classList.add('active'); });
+      document.querySelectorAll('.nav-item').forEach(item => {
+        if(item.querySelector('.nav-text').innerText === label) item.classList.add('active');
+      });
+
       if(viewId === 'trends') window.dispatchEvent(new Event('resize'));
     }
 
     const sheetId = "10ouuSW_pnOnqJM7N-5eNKyhFIeG4VKiNM8ggdb5PIe4";
     const feedUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
     lucide.createIcons();
 
-    function toManilaTime(utc) {
-      if (!utc || utc === '--') return '--';
-      const d = new Date(utc + " UTC");
-      return isNaN(d) ? utc : d.toLocaleString('en-ZA', { timeZone: 'Asia/Manila', hour12: false }).replace(',', '');
+    function toManilaTime(utcString) {
+      if (!utcString || utcString === '--') return '--';
+      try {
+        const date = new Date(utcString + " UTC");
+        if (isNaN(date.getTime())) return utcString;
+        return date.toLocaleString('en-ZA', { 
+          timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+        }).replace(/\//g, '-').replace(',', '');
+      } catch (e) { return utcString; }
+    }
+
+    function processImageUrl(url) {
+      if (!url || !url.includes("id=")) return url;
+      const fileId = url.split("id=")[1].split("&")[0];
+      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
     }
 
     async function fetchWeatherData() {
+      const statusEl = document.getElementById('status');
+      statusEl.innerText = "Updating...";
+      
       try {
-        const res = await fetch(feedUrl);
-        const txt = await res.text();
-        const json = JSON.parse(txt.substring(txt.indexOf("(") + 1, txt.lastIndexOf(")")));
+        const response = await fetch(feedUrl);
+        const text = await response.text();
+        const jsonString = text.substring(text.indexOf("(") + 1, text.lastIndexOf(")"));
+        const json = JSON.parse(jsonString);
+        
         const rows = json.table.rows;
         const headers = json.table.cols.map(c => c.label);
-        const latest = rows[rows.length - 1].c;
+        const latestRow = rows[rows.length - 1].c;
+
         const tsIdx = headers.indexOf("Timestamp (UTC)");
+        const rawTs = latestRow[tsIdx]?.f || latestRow[tsIdx]?.v || '--';
+        document.getElementById('header-ts').innerText = toManilaTime(rawTs);
 
-        document.getElementById('header-ts').innerText = toManilaTime(latest[tsIdx]?.f || latest[tsIdx]?.v);
+        const grid = document.getElementById('data-grid');
+        grid.innerHTML = '';
+        
+        let heatIndex = 0, rainRate = 0, voltage = 0, windDir = 0, solar = 0;
 
-        // Data Grid
-        const grid = document.getElementById('data-grid'); grid.innerHTML = '';
-        let heatIdx = 0, rain = 0, volt = 0, wind = 0;
         headers.forEach((h, i) => {
-          if (!h || h.includes("Timestamp") || h.startsWith("Image")) return;
-          const v = latest[i]?.v || 0;
-          if (h.includes("Heat Index")) heatIdx = parseFloat(v);
-          if (h.includes("Precip")) rain = parseFloat(v);
-          if (h.includes("Voltage")) volt = parseFloat(v);
-          if (h.includes("Wind Dir")) wind = parseFloat(v);
-          const box = document.createElement('div'); box.className = 'data-box';
-          box.innerHTML = `<div class="data-label">${h}</div><div class="data-value">${latest[i]?.f || v}</div>`;
+          if (!h || h.toLowerCase().includes("timestamp") || h.toLowerCase().startsWith("image")) return;
+          const val = latestRow[i] ? (latestRow[i].v) : 0;
+          const displayVal = latestRow[i] ? (latestRow[i].f || latestRow[i].v) : '--';
+          
+          if (h.includes("Heat Index")) heatIndex = parseFloat(val);
+          if (h.includes("Precip")) rainRate = parseFloat(val);
+          if (h.includes("Voltage")) voltage = parseFloat(val);
+          if (h.includes("Wind Dir")) windDir = parseFloat(val);
+          if (h.includes("Solar")) solar = parseFloat(val);
+
+          const box = document.createElement('div');
+          box.className = 'data-box';
+          
+          if (h.includes("Wind Dir")) {
+            box.innerHTML = `<div class="data-label">${h}</div><div class="wind-rose-container"><div class="wind-arrow" style="transform: translate(-50%, 0) rotate(${windDir}deg)"></div></div><div class="data-value">${displayVal}°</div>`;
+          } else {
+            box.innerHTML = `<div class="data-label">${h}</div><div class="data-value">${displayVal}</div>`;
+          }
           grid.appendChild(box);
         });
 
-        // Icons
-        const toggle = (id, active, cls) => {
-          const e = document.getElementById(id);
-          if(active) { e.classList.add('active'); if(cls) e.classList.add(cls); } else e.className = 'status-icon';
+        const toggleIcon = (id, active, className) => {
+          const el = document.getElementById(id);
+          if(active) { el.classList.add('active'); if(className) el.classList.add(className); }
+          else { el.classList.remove('active'); el.classList.remove(className); }
         };
-        toggle('icon-hot', heatIdx > 30, 'hot');
-        toggle('icon-rain', rain > 0, 'rain');
-        toggle('icon-battery', volt > 5, 'battery');
 
-        // Images
-        [1,2,3,4].forEach(n => {
-          const idx = headers.indexOf(`Image_Cam${n}`);
-          if(idx !== -1) {
-            const val = latest[idx]?.v || '';
-            document.getElementById(`img-cam${n}`).src = val.includes("id=") ? `https://drive.google.com/thumbnail?id=${val.split("id=")[1].split("&")[0]}&sz=w1000` : val;
-          }
+        toggleIcon('icon-hot', heatIndex > 30, 'hot');
+        toggleIcon('icon-rain', rainRate > 0, 'rain');
+        toggleIcon('icon-battery', voltage > 5.0, 'battery');
+        toggleIcon('icon-cloud', solar < 200 && (new Date().getHours() > 6 && new Date().getHours() < 18), null);
+        
+        ['Image_Cam1', 'Image_Cam2', 'Image_Cam3', 'Image_Cam4'].forEach((id, index) => {
+          const colIdx = headers.indexOf(id);
+          if (colIdx !== -1) document.getElementById(`img-cam${index+1}`).src = processImageUrl(latestRow[colIdx]?.v || '');
         });
 
-        // Charts
-        const container = document.getElementById('charts-container'); container.innerHTML = '';
-        const build = (title, fields) => {
-          const data = rows.slice(-288);
-          const datasets = fields.map((f, idx) => {
-            const col = headers.indexOf(f);
-            if(col === -1) return null;
-            return {
-              label: f, data: data.map(r => r.c[col]?.v || null),
-              borderColor: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12'][idx],
-              borderWidth: 2, pointRadius: 0, tension: 0.3
-            };
-          }).filter(d => d);
+        const chartsContainer = document.getElementById('charts-container');
+        chartsContainer.innerHTML = '';
 
-          if(!datasets.length) return;
-          const box = document.createElement('div'); box.className = 'chart-box';
-          box.innerHTML = `<h3 style="margin:0 0 10px 0; font-size:14px;">${title}</h3><div style="height:250px;"><canvas></canvas></div>`;
-          container.appendChild(box);
+        function buildChart(title, fieldList) {
+          const lastData = rows.slice(-288);
+          const labels = lastData.map(r => {
+            const timeStr = r.c[tsIdx]?.f || r.c[tsIdx]?.v || '';
+            const mTime = toManilaTime(timeStr);
+            return mTime !== '--' ? mTime.split(' ')[1] : '';
+          });
 
-          new Chart(box.querySelector('canvas'), {
+          let datasets = [];
+          let seenUnits = [];
+
+          fieldList.forEach((fieldName) => {
+            const colIdx = headers.indexOf(fieldName);
+            if (colIdx === -1) return;
+            const unit = (fieldName.match(/\(([^)]+)\)/) || [null, 'val'])[1];
+            if (!seenUnits.includes(unit)) seenUnits.push(unit);
+            const isSecondAxis = seenUnits.indexOf(unit) > 0;
+
+            datasets.push({
+              label: fieldName,
+              data: lastData.map(r => r.c[colIdx]?.v || null),
+              borderColor: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'][datasets.length % 5],
+              backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: 0.3,
+              yAxisID: isSecondAxis ? 'y1' : 'y'
+            });
+          });
+
+          if (datasets.length === 0) return;
+          const chartBox = document.createElement('div');
+          chartBox.className = 'chart-box';
+          chartBox.innerHTML = `<h3>${title}</h3><div style="height:300px;"><canvas></canvas></div>`;
+          chartsContainer.appendChild(chartBox);
+
+          new Chart(chartBox.querySelector('canvas'), {
             type: 'line',
-            data: { labels: data.map(r => toManilaTime(r.c[tsIdx]?.v).split(' ')[1]), datasets },
+            data: { labels, datasets },
             options: {
               responsive: true, maintainAspectRatio: false,
-              interaction: { mode: 'index', intersect: false }, // RESTORED HOVER LOGIC
-              plugins: { legend: { labels: { boxWidth: 10, font: { size: 10 } } } },
-              scales: { x: { ticks: { maxTicksLimit: 6 } } }
+              scales: {
+                x: { ticks: { maxTicksLimit: 8 } },
+                y: { type: 'linear', position: 'left', title: { display: true, text: seenUnits[0] } },
+                y1: { type: 'linear', display: seenUnits.length > 1, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: seenUnits[1] } }
+              }
             }
           });
-        };
+        }
 
-        build("Wind & Thermal", ["Wind Speed (kt)", "Wind Chill (C)", "Heat Index (C)"]);
-        build("Environment", ["Temp (C)", "Relative Humidity", "Precip (in/hr)"]);
-        build("System", ["Voltage"]);
+        buildChart("Wind Metrics", ["Wind Speed (kt)", "Max Wind Speed (kt)", "Wind Chill (C)"]);
+        buildChart("Precipitation & Humidity", ["Precip (in/hr)", "Relative Humidity"]);
+        buildChart("Temperature Profile", ["Temp (C)", "Dew Point (C)", "Relative Humidity", "Heat Index (C)"]);
+        buildChart("Atmospheric Pressure", ["Altimeter (inHg)", "Station Pressure (inHg)"]);
+        buildChart("System Diagnostics", ["Voltage"]);
 
-      } catch (e) { console.error(e); }
+        statusEl.innerText = "Status: Live";
+      } catch (error) {
+        statusEl.innerText = "Status: Error";
+      }
     }
 
     fetchWeatherData();
