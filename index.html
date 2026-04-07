@@ -313,7 +313,7 @@
           const labels = lastData.map(r => {
             const timeStr = r.c[tsIdx]?.f || r.c[tsIdx]?.v || '';
             const mTime = toManilaTime(timeStr);
-            return mTime !== '--' ? mTime.split(' ')[1] : '';
+            return mTime !== '--' ? mTime.split(' ')[1] : ''; // Show only HH:MM:SS on X-axis
           });
 
           let datasets = [];
@@ -322,7 +322,8 @@
           fieldList.forEach((fieldName) => {
             const colIdx = headers.indexOf(fieldName);
             if (colIdx === -1) return;
-            const unit = (fieldName.match(/\(([^)]+)\)/) || [null, 'val'])[1];
+            const match = fieldName.match(/\(([^)]+)\)/);
+            const unit = match ? match[1] : 'val';
             if (!seenUnits.includes(unit)) seenUnits.push(unit);
             const isSecondAxis = seenUnits.indexOf(unit) > 0;
 
@@ -330,7 +331,10 @@
               label: fieldName,
               data: lastData.map(r => r.c[colIdx]?.v || null),
               borderColor: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'][datasets.length % 5],
-              backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: 0.3,
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.3,
               yAxisID: isSecondAxis ? 'y1' : 'y'
             });
           });
@@ -338,7 +342,7 @@
           if (datasets.length === 0) return;
           const chartBox = document.createElement('div');
           chartBox.className = 'chart-box';
-          chartBox.innerHTML = `<h3>${title}</h3><div style="height:300px;"><canvas></canvas></div>`;
+          chartBox.innerHTML = `<h3>${title}</h3><canvas></canvas>`;
           chartsContainer.appendChild(chartBox);
 
           new Chart(chartBox.querySelector('canvas'), {
@@ -346,10 +350,11 @@
             data: { labels, datasets },
             options: {
               responsive: true, maintainAspectRatio: false,
+              interaction: { mode: 'index', intersect: false },
               scales: {
-                x: { ticks: { maxTicksLimit: 8 } },
-                y: { type: 'linear', position: 'left', title: { display: true, text: seenUnits[0] } },
-                y1: { type: 'linear', display: seenUnits.length > 1, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: seenUnits[1] } }
+                x: { ticks: { maxTicksLimit: 12, font: { size: 10 } } },
+                y: { type: 'linear', display: true, position: 'left', title: { display: true, text: seenUnits[0] || '' } },
+                y1: { type: 'linear', display: seenUnits.length > 1, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: seenUnits[1] || '' } }
               }
             }
           });
@@ -360,6 +365,13 @@
         buildChart("Temperature Profile", ["Temp (C)", "Dew Point (C)", "Relative Humidity", "Heat Index (C)"]);
         buildChart("Atmospheric Pressure", ["Altimeter (inHg)", "Station Pressure (inHg)"]);
         buildChart("System Diagnostics", ["Voltage"]);
+
+        statusEl.innerText = "Status: Live (Refreshing every 5 mins)";
+      } catch (error) {
+        console.error("Dashboard Error:", error);
+        statusEl.innerText = "Status: Error updating data.";
+      }
+    }
 
         statusEl.innerText = "Status: Live";
       } catch (error) {
