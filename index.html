@@ -366,17 +366,9 @@
         buildChart("Atmospheric Pressure", ["Altimeter (inHg)", "Station Pressure (inHg)"]);
         buildChart("System Diagnostics", ["Voltage"]);
 
-        statusEl.innerText = "Status: Live (Refreshing every 5 mins)";
+        statusEl.innerText = "Status: Live";
       } catch (error) {
-        console.error("Dashboard Error:", error);
-        statusEl.innerText = "Status: Error updating data.";
-      }
-    }
-
-        statusEl.innerText = "Status: Live (Refreshing every 5 mins)";
-      } catch (error) {
-        console.error("Dashboard Error:", error);
-        statusEl.innerText = "Status: Error updating data.";
+        statusEl.innerText = "Status: Error";
       }
     }
 
