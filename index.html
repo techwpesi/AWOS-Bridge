@@ -373,9 +373,10 @@
       }
     }
 
-        statusEl.innerText = "Status: Live";
+        statusEl.innerText = "Status: Live (Refreshing every 5 mins)";
       } catch (error) {
-        statusEl.innerText = "Status: Error";
+        console.error("Dashboard Error:", error);
+        statusEl.innerText = "Status: Error updating data.";
       }
     }
 
