@@ -342,7 +342,7 @@
           if (datasets.length === 0) return;
           const chartBox = document.createElement('div');
           chartBox.className = 'chart-box';
-          chartBox.innerHTML = `<h3>${title}</h3><canvas></canvas>`;
+          chartBox.innerHTML = `<h3>${title}</h3><div style="height:300px;"><canvas></canvas>`;
           chartsContainer.appendChild(chartBox);
 
           new Chart(chartBox.querySelector('canvas'), {
