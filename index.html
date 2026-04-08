@@ -6,6 +6,9 @@
   <title>SBMA AWOS Live Weather Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <style>
     :root {
       --sidebar-width: 70px;
@@ -39,7 +42,7 @@
     .nav-item {
       display: flex;
       align-items: center;
-      padding: 18px 23px; /* Centers the icon in the 70px bar */
+      padding: 18px 23px;
       cursor: pointer;
       transition: all 0.2s;
       white-space: nowrap;
@@ -94,7 +97,7 @@
     .data-value { font-size: 1.4rem; color: var(--primary-dark); font-weight: 800; }
 
     .wind-rose-container { width: 50px; height: 50px; margin: 10px auto; position: relative; border: 2px solid #f0f0f0; border-radius: 50%; }
-    .wind-arrow { position: absolute; top: 50%; left: 50%; width: 3px; height: 25px; background: #e74c3c; margin-left: -1.5px; margin-top: -20px; transform-origin: bottom center; transition: transform 1s; }
+    .wind-arrow { position: absolute; top: 50%; left: 50%; width: 3px; height: 25px; background: #e74c3c; margin-left: -1.5px; margin-top: -20px; transform-origin: bottom center; transition: transform 0.3s; }
     .wind-arrow::after { content: ''; position: absolute; top: 0; left: -4.5px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #e74c3c; }
 
     .images-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
@@ -104,8 +107,19 @@
 
     .chart-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
 
+    /* Map View Styles */
+    #map-container { height: 600px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px; }
+    .map-info-panel { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+    .map-stat { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent-blue); }
+    .map-stat-label { font-size: 0.75rem; color: #7f8c8d; font-weight: 700; text-transform: uppercase; }
+    .map-stat-value { font-size: 1.2rem; color: var(--primary-dark); font-weight: 800; margin-top: 5px; }
+
+    .leaflet-popup-content { font-family: 'Segoe UI', sans-serif; }
+    .popup-title { font-weight: bold; color: var(--primary-dark); font-size: 1rem; margin-bottom: 8px; }
+    .popup-data { font-size: 0.85rem; margin: 4px 0; }
+
     /* Mobile Navigation Bar */
-    .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--primary-dark); z-index: 1001; grid-template-columns: repeat(3, 1fr); box-shadow: 0 -2px 10px rgba(0,0,0,0.2); }
+    .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--primary-dark); z-index: 1001; grid-template-columns: repeat(4, 1fr); box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
     .mobile-nav .nav-item { flex-direction: column; padding: 12px 0; border-left: none; border-top: 3px solid transparent; }
     .mobile-nav .nav-item i { margin-right: 0; margin-bottom: 5px; }
     .mobile-nav .nav-item .nav-text { opacity: 1; font-size: 0.65rem; }
@@ -114,13 +128,15 @@
     /* Mobile Responsive Tweaks */
     @media (max-width: 850px) {
       .sidebar { display: none; }
-      .mobile-nav { display: grid; }
+      .mobile-nav { display: grid; grid-template-columns: repeat(4, 1fr); }
       .content-wrapper { margin-left: 0; margin-bottom: 70px; }
       header { flex-direction: column; gap: 15px; padding: 15px; text-align: center; }
       .header-right { flex-direction: column; width: 100%; }
       .status-icons { flex-wrap: wrap; justify-content: center; }
       .images-grid { grid-template-columns: 1fr; }
       .logo { height: 40px; }
+      #map-container { height: 400px; }
+      .map-info-panel { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -131,6 +147,10 @@
     <div class="nav-item active" onclick="showView('latest', this)">
       <i data-lucide="layout-dashboard"></i>
       <span class="nav-text">Latest Conditions</span>
+    </div>
+    <div class="nav-item" onclick="showView('map', this)">
+      <i data-lucide="map-pin"></i>
+      <span class="nav-text">Map View</span>
     </div>
     <div class="nav-item" onclick="showView('cameras', this)">
       <i data-lucide="camera"></i>
@@ -146,6 +166,10 @@
     <div class="nav-item active" onclick="showView('latest', this)">
       <i data-lucide="layout-dashboard"></i>
       <span class="nav-text">Latest</span>
+    </div>
+    <div class="nav-item" onclick="showView('map', this)">
+      <i data-lucide="map-pin"></i>
+      <span class="nav-text">Map</span>
     </div>
     <div class="nav-item" onclick="showView('cameras', this)">
       <i data-lucide="camera"></i>
@@ -188,6 +212,28 @@
         <div id="data-grid" class="data-grid-30"></div>
       </section>
 
+      <section id="map" class="view-section">
+        <div id="map-container"></div>
+        <div class="map-info-panel">
+          <div class="map-stat">
+            <div class="map-stat-label">Station Coordinates</div>
+            <div class="map-stat-value" id="map-coords">Loading...</div>
+          </div>
+          <div class="map-stat">
+            <div class="map-stat-label">Current Temperature</div>
+            <div class="map-stat-value" id="map-temp">--</div>
+          </div>
+          <div class="map-stat">
+            <div class="map-stat-label">Wind Speed</div>
+            <div class="map-stat-value" id="map-wind">--</div>
+          </div>
+          <div class="map-stat">
+            <div class="map-stat-label">Humidity</div>
+            <div class="map-stat-value" id="map-humidity">--</div>
+          </div>
+        </div>
+      </section>
+
       <section id="cameras" class="view-section">
         <div class="images-grid">
           <div class="img-container"><img id="img-cam1" alt="Cam 1"><div class="img-label">Station View 1</div></div>
@@ -205,20 +251,66 @@
   </div>
 
   <script>
+    let map;
+    let stationMarker;
+    let currentLat = 14.8039;
+    let currentLng = 120.2723;
+
     function showView(viewId, el) {
       document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
       
-      // Sync active state for both Mobile and Desktop navs
       document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
       
-      // Find all instances of this nav link (one in sidebar, one in mobile-nav)
       const label = el.querySelector('.nav-text').innerText;
       document.querySelectorAll('.nav-item').forEach(item => {
         if(item.querySelector('.nav-text').innerText === label) item.classList.add('active');
       });
 
       if(viewId === 'trends') window.dispatchEvent(new Event('resize'));
+      if(viewId === 'map') initMap();
+    }
+
+    function initMap() {
+      if (map) {
+        map.invalidateSize();
+        return;
+      }
+
+      map = L.map('map-container').setView([currentLat, currentLng], 13);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      stationMarker = L.marker([currentLat, currentLng], {
+        title: 'SBMA AWOS Station'
+      }).addTo(map);
+
+      updateMapMarker();
+    }
+
+    function updateMapMarker() {
+      if (!stationMarker) return;
+      
+      const temp = document.getElementById('map-temp').innerText;
+      const wind = document.getElementById('map-wind').innerText;
+      const humidity = document.getElementById('map-humidity').innerText;
+      const coords = `${currentLat.toFixed(4)}°N, ${currentLng.toFixed(4)}°E`;
+
+      document.getElementById('map-coords').innerText = coords;
+
+      const popupContent = `
+        <div class="popup-title">SBMA AWOS Station</div>
+        <div class="popup-data"><strong>Lat:</strong> ${currentLat.toFixed(4)}°</div>
+        <div class="popup-data"><strong>Lon:</strong> ${currentLng.toFixed(4)}°</div>
+        <div class="popup-data"><strong>Temperature:</strong> ${temp}</div>
+        <div class="popup-data"><strong>Wind Speed:</strong> ${wind}</div>
+        <div class="popup-data"><strong>Humidity:</strong> ${humidity}</div>
+      `;
+
+      stationMarker.bindPopup(popupContent);
     }
 
     const sheetId = "10ouuSW_pnOnqJM7N-5eNKyhFIeG4VKiNM8ggdb5PIe4";
@@ -262,13 +354,23 @@
         const rawTs = latestRow[tsIdx]?.f || latestRow[tsIdx]?.v || '--';
         document.getElementById('header-ts').innerText = toManilaTime(rawTs);
 
+        // Extract Latitude and Longitude from Google Sheet - EXACT MATCH
+        const latIdx = headers.findIndex(h => h && h.trim() === 'Lat');
+        const lngIdx = headers.findIndex(h => h && h.trim() === 'Lon');
+
+        if (latIdx !== -1 && lngIdx !== -1) {
+          currentLat = parseFloat(latestRow[latIdx]?.v) || currentLat;
+          currentLng = parseFloat(latestRow[lngIdx]?.v) || currentLng;
+        }
+
         const grid = document.getElementById('data-grid');
         grid.innerHTML = '';
         
         let heatIndex = 0, rainRate = 0, voltage = 0, windDir = 0, solar = 0;
+        let temp = '--', windSpeed = '--', humidity = '--';
 
         headers.forEach((h, i) => {
-          if (!h || h.toLowerCase().includes("timestamp") || h.toLowerCase().startsWith("image")) return;
+          if (!h || h.toLowerCase().includes("timestamp") || h.toLowerCase().startsWith("image") || h.trim() === "Lat" || h.trim() === "Lon") return;
           const val = latestRow[i] ? (latestRow[i].v) : 0;
           const displayVal = latestRow[i] ? (latestRow[i].f || latestRow[i].v) : '--';
           
@@ -277,6 +379,9 @@
           if (h.includes("Voltage")) voltage = parseFloat(val);
           if (h.includes("Wind Dir")) windDir = parseFloat(val);
           if (h.includes("Solar")) solar = parseFloat(val);
+          if (h.includes("Temp (C)")) temp = displayVal;
+          if (h.includes("Wind Speed")) windSpeed = displayVal;
+          if (h.includes("Relative Humidity")) humidity = displayVal;
 
           const box = document.createElement('div');
           box.className = 'data-box';
@@ -288,6 +393,21 @@
           }
           grid.appendChild(box);
         });
+
+        // Update map stats
+        document.getElementById('map-temp').innerText = temp;
+        document.getElementById('map-wind').innerText = windSpeed;
+        document.getElementById('map-humidity').innerText = humidity;
+
+        // Update map if it exists and recreate marker with new coordinates
+        if (map) {
+          map.setView([currentLat, currentLng], 13);
+          if (stationMarker) {
+            stationMarker.setLatLng([currentLat, currentLng]);
+          }
+        }
+
+        updateMapMarker();
 
         const toggleIcon = (id, active, className) => {
           const el = document.getElementById(id);
@@ -313,7 +433,7 @@
           const labels = lastData.map(r => {
             const timeStr = r.c[tsIdx]?.f || r.c[tsIdx]?.v || '';
             const mTime = toManilaTime(timeStr);
-            return mTime !== '--' ? mTime.split(' ')[1] : ''; // Show only HH:MM:SS on X-axis
+            return mTime !== '--' ? mTime.split(' ')[1] : '';
           });
 
           let datasets = [];
@@ -369,6 +489,7 @@
         statusEl.innerText = "Status: Live";
       } catch (error) {
         statusEl.innerText = "Status: Error";
+        console.error(error);
       }
     }
 
