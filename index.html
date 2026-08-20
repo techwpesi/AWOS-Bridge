@@ -13,12 +13,16 @@
     :root {
       --sidebar-width: 70px;
       --sidebar-expanded: 220px;
-      --primary-dark: #2c3e50;
-      --accent-blue: #3498db;
-      --header-height: 80px;
+      --primary-dark: #1e293b;
+      --accent-blue: #38bdf8;
+      --card-bg: #1e293b;
+      --card-light-bg: #283548;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
     }
 
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 0; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; margin: 0; padding: 0; color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
     
     /* Desktop Sidebar */
     .sidebar {
@@ -34,7 +38,8 @@
       z-index: 1000;
       display: flex;
       flex-direction: column;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      border-right: 1px solid var(--border-color);
     }
 
     .sidebar:hover { width: var(--sidebar-expanded); }
@@ -47,11 +52,11 @@
       transition: all 0.2s;
       white-space: nowrap;
       border-left: 4px solid transparent;
-      color: #bdc3c7;
+      color: #94a3b8;
     }
 
-    .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
-    .nav-item.active { background: rgba(255,255,255,0.15); border-left-color: var(--accent-blue); color: white; }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .nav-item.active { background: rgba(255,255,255,0.1); border-left-color: var(--accent-blue); color: white; }
 
     .nav-item i { min-width: 24px; margin-right: 25px; }
     .nav-text { opacity: 0; transition: opacity 0.2s; font-weight: 500; }
@@ -61,113 +66,217 @@
     .content-wrapper { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; }
 
     header { 
-      background: white; color: var(--primary-dark); padding: 10px 30px; 
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      background: var(--primary-dark); color: var(--text-main); padding: 12px 30px; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      border-bottom: 1px solid var(--border-color);
       display: flex; justify-content: space-between; align-items: center; 
       position: sticky; top: 0; z-index: 900;
     }
     
     .header-left { display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; transition: opacity 0.2s; }
-    .logo-link:hover { opacity: 0.8; }
-    .logo { height: 50px; width: auto; }
+    .logo-link { display: flex; align-items: center; transition: opacity 0.2s; background: white; padding: 4px 8px; border-radius: 6px; }
+    .logo-link:hover { opacity: 0.9; }
+    .logo { height: 40px; width: auto; }
     
-    .header-titles h1 { margin: 0; font-size: 1.2rem; color: var(--primary-dark); }
-    #header-ts { font-size: 0.9rem; color: var(--accent-blue); font-weight: bold; }
+    .header-titles h1 { margin: 0; font-size: 1.2rem; color: #fff; }
+    #header-ts { font-size: 0.85rem; color: var(--accent-blue); font-weight: bold; }
     
-    .status-icons { display: flex; gap: 12px; background: #f8f9fa; padding: 10px 15px; border-radius: 10px; border: 1px solid #eee; }
-    .status-icon { display: flex; align-items: center; gap: 6px; color: #ccc; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-    .status-icon.active { color: #555; }
-    .status-icon.active.hot { color: #e67e22; }
-    .status-icon.active.rain { color: #3498db; }
-    .status-icon.active.battery { color: #2ecc71; }
+    .status-icons { display: flex; gap: 12px; background: #0f172a; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border-color); }
+    .status-icon { display: flex; align-items: center; gap: 6px; color: #475569; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .status-icon.active { color: #cbd5e1; }
+    .status-icon.active.hot { color: #f97316; }
+    .status-icon.active.rain { color: #38bdf8; }
+    .status-icon.active.battery { color: #22c55e; }
 
-    .btn-export { background: #27ae60; color: white; text-decoration: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; }
+    .btn-export { background: #16a34a; color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; }
 
-    .main-container { padding: 25px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+    .main-container { padding: 25px; max-width: 1500px; margin: 0 auto; width: 100%; box-sizing: border-box; }
     .view-section { display: none; }
     .view-section.active { display: block; animation: fadeIn 0.3s ease; }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* Uniform Data Grid */
-    .data-grid-30 { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
-      grid-auto-rows: 1fr;
-      gap: 15px; 
+    /* Operator Layout Grid */
+    .operator-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
     }
-    
-    .data-box { 
-      background: #fff; 
-      border: 1px solid #e0e0e0; 
-      border-radius: 12px; 
-      padding: 15px; 
-      text-align: center; 
+
+    .card-hero-metar {
+      grid-column: span 2;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      gap: 10px;
+    }
+
+    .metar-header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      height: 100%;
-      box-sizing: border-box;
-      min-height: 140px;
-    }
-    
-    .data-label { font-size: 0.65rem; color: #95a5a6; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
-    .data-value { font-size: 1.4rem; color: var(--primary-dark); font-weight: 800; word-break: break-word; }
-
-    /* Custom sizing for METAR to maintain uniform card dimensions */
-    .data-value.metar-text {
       font-size: 0.75rem;
-      font-weight: 700;
-      line-height: 1.3;
-      max-height: 90px;
-      overflow-y: auto;
-      width: 100%;
-      color: #2c3e50;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--accent-blue);
+      text-transform: uppercase;
     }
 
-    .wind-rose-container { width: 40px; height: 40px; margin: 5px auto; position: relative; border: 2px solid #f0f0f0; border-radius: 50%; }
-    .wind-arrow { position: absolute; top: 50%; left: 50%; width: 3px; height: 20px; background: #e74c3c; margin-left: -1.5px; margin-top: -16px; transform-origin: bottom center; transition: transform 0.3s; }
-    .wind-arrow::after { content: ''; position: absolute; top: 0; left: -4.5px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #e74c3c; }
+    .metar-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .metar-decoded {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .metar-decoded div span {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .metar-raw-box {
+      background: #090d16;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #38bdf8;
+      word-break: break-all;
+    }
+
+    .op-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      min-height: 120px;
+    }
+
+    .op-card.alert-bg {
+      background: linear-gradient(135deg, #451a03 0%, #1e293b 100%);
+      border-color: #f97316;
+    }
+
+    .op-card-title {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .op-card-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 8px 0 4px 0;
+    }
+
+    .op-card-sub {
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+
+    .sparkline-container {
+      height: 35px;
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    /* Compass Graphic */
+    .compass-box {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #334155;
+      border-radius: 50%;
+      position: relative;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+    }
+
+    .compass-arrow {
+      width: 4px;
+      height: 30px;
+      background: #ef4444;
+      position: absolute;
+      transform-origin: bottom center;
+      transition: transform 0.5s ease;
+      top: 15px;
+    }
+
+    .compass-arrow::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -4px;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 8px solid #ef4444;
+    }
+
+    .compass-center {
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      z-index: 2;
+    }
 
     .images-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .img-container { aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; position: relative; }
+    .img-container { aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid var(--border-color); }
     .img-container img { width: 100%; height: 100%; object-fit: cover; }
-    .img-label { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 12px; font-size: 0.75rem; border-radius: 4px; }
+    .img-label { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 12px; font-size: 0.75rem; border-radius: 4px; }
 
-    .chart-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
+    .chart-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 25px; }
 
-    /* Map View Styles */
-    #map-container { height: 600px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px; }
-    .map-info-panel { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
-    .map-stat { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent-blue); }
-    .map-stat-label { font-size: 0.75rem; color: #7f8c8d; font-weight: 700; text-transform: uppercase; }
-    .map-stat-value { font-size: 1.2rem; color: var(--primary-dark); font-weight: 800; margin-top: 5px; }
-
-    .leaflet-popup-content { font-family: 'Segoe UI', sans-serif; }
-    .popup-title { font-weight: bold; color: var(--primary-dark); font-size: 1rem; margin-bottom: 8px; }
-    .popup-data { font-size: 0.85rem; margin: 4px 0; }
+    #map-container { height: 600px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.3); margin-bottom: 25px; border: 1px solid var(--border-color); }
+    .map-info-panel { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+    .map-stat { background: #0f172a; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent-blue); }
+    .map-stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+    .map-stat-value { font-size: 1.2rem; color: #fff; font-weight: 800; margin-top: 5px; }
 
     /* Mobile Navigation Bar */
-    .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--primary-dark); z-index: 1001; grid-template-columns: repeat(4, 1fr); box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+    .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--primary-dark); z-index: 1001; grid-template-columns: repeat(4, 1fr); box-shadow: 0 -2px 10px rgba(0,0,0,0.3); border-top: 1px solid var(--border-color); }
     .mobile-nav .nav-item { flex-direction: column; padding: 12px 0; border-left: none; border-top: 3px solid transparent; }
     .mobile-nav .nav-item i { margin-right: 0; margin-bottom: 5px; }
     .mobile-nav .nav-item .nav-text { opacity: 1; font-size: 0.65rem; }
     .mobile-nav .nav-item.active { border-top-color: var(--accent-blue); background: none; }
 
-    /* Mobile Responsive Tweaks */
-    @media (max-width: 850px) {
+    @media (max-width: 1024px) {
+      .operator-grid { grid-template-columns: repeat(2, 1fr); }
+      .card-hero-metar { grid-column: span 2; }
+    }
+
+    @media (max-width: 650px) {
+      .operator-grid { grid-template-columns: 1fr; }
+      .card-hero-metar { grid-column: span 1; }
+      .metar-split { grid-template-columns: 1fr; }
       .sidebar { display: none; }
       .mobile-nav { display: grid; grid-template-columns: repeat(4, 1fr); }
       .content-wrapper { margin-left: 0; margin-bottom: 70px; }
       header { flex-direction: column; gap: 15px; padding: 15px; text-align: center; }
-      .header-right { flex-direction: column; width: 100%; }
-      .status-icons { flex-wrap: wrap; justify-content: center; }
       .images-grid { grid-template-columns: 1fr; }
-      .logo { height: 40px; }
       #map-container { height: 400px; }
-      .map-info-panel { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -221,7 +330,7 @@
         <div class="header-titles">
           <h1>SBMA AWOS Live Weather</h1>
           <div id="header-ts">Loading Manila Time...</div>
-          <div id="status" style="font-size: 0.7rem; color: #999;">Initializing...</div>
+          <div id="status" style="font-size: 0.7rem; color: #64748b;">Initializing...</div>
         </div>
       </div>
       
@@ -240,7 +349,7 @@
     <div class="main-container">
       
       <section id="latest" class="view-section active">
-        <div id="data-grid" class="data-grid-30"></div>
+        <div id="operator-grid" class="operator-grid"></div>
       </section>
 
       <section id="map" class="view-section">
@@ -286,6 +395,7 @@
     let stationMarker;
     let currentLat = 14.8039;
     let currentLng = 120.2723;
+    let sparklineInstances = {};
 
     function showView(viewId, el) {
       document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
@@ -347,8 +457,6 @@
     const sheetId = "1MKnXdNCsGitXIWA-bpStyBhi9oCSUpj7831SKYOM87M";
     const feedUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-    lucide.createIcons();
-
     function toManilaTime(utcString) {
       if (!utcString || utcString === '--') return '--';
       try {
@@ -365,6 +473,34 @@
       if (!url || !url.includes("id=")) return url;
       const fileId = url.split("id=")[1].split("&")[0];
       return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+    }
+
+    function createSparkline(canvasId, dataArr, strokeColor = '#38bdf8') {
+      const ctx = document.getElementById(canvasId);
+      if(!ctx) return;
+      if (sparklineInstances[canvasId]) {
+        sparklineInstances[canvasId].destroy();
+      }
+      sparklineInstances[canvasId] = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dataArr.map((_, i) => i),
+          datasets: [{
+            data: dataArr,
+            borderColor: strokeColor,
+            borderWidth: 1.5,
+            pointRadius: 0,
+            fill: false,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: { x: { display: false }, y: { display: false } }
+        }
+      });
     }
 
     async function fetchWeatherData() {
@@ -385,7 +521,6 @@
         const rawTs = latestRow[tsIdx]?.f || latestRow[tsIdx]?.v || '--';
         document.getElementById('header-ts').innerText = toManilaTime(rawTs);
 
-        // Extract Latitude and Longitude from Google Sheet
         const latIdx = headers.findIndex(h => h && h.trim() === 'Lat');
         const lngIdx = headers.findIndex(h => h && h.trim() === 'Lon');
 
@@ -394,65 +529,202 @@
           currentLng = parseFloat(latestRow[lngIdx]?.v) || currentLng;
         }
 
-        const grid = document.getElementById('data-grid');
-        grid.innerHTML = '';
-        
-        let heatIndex = 0, rainRate = 0, voltage = 0, windDir = 0, solar = 0;
-        let temp = '--', windSpeed = '--', humidity = '--';
-        let altimeterInHg = null;
+        const getVal = (fieldKeyword) => {
+          const idx = headers.findIndex(h => h && h.toLowerCase().includes(fieldKeyword.toLowerCase()));
+          if (idx === -1 || !latestRow[idx]) return { raw: 0, display: '--' };
+          return {
+            raw: parseFloat(latestRow[idx].v) || 0,
+            display: latestRow[idx].f || latestRow[idx].v || '--'
+          };
+        };
 
-        headers.forEach((h, i) => {
-          if (!h || h.toLowerCase().includes("timestamp") || h.toLowerCase().startsWith("image") || h.trim() === "Lat" || h.trim() === "Lon") return;
-          const val = latestRow[i] ? (latestRow[i].v) : 0;
-          const displayVal = latestRow[i] ? (latestRow[i].f || latestRow[i].v) : '--';
-          
-          if (h.includes("Heat Index")) heatIndex = parseFloat(val);
-          if (h.includes("Precip")) rainRate = parseFloat(val);
-          if (h.includes("Voltage")) voltage = parseFloat(val);
-          if (h.includes("Wind Dir")) windDir = parseFloat(val);
-          if (h.includes("Solar")) solar = parseFloat(val);
-          if (h.includes("Temp (C)")) temp = displayVal;
-          if (h.includes("Wind Speed")) windSpeed = displayVal;
-          if (h.includes("Relative Humidity")) humidity = displayVal;
-          if (h.toLowerCase().includes("altimeter")) altimeterInHg = parseFloat(val);
+        const getHistory = (fieldKeyword, count = 20) => {
+          const idx = headers.findIndex(h => h && h.toLowerCase().includes(fieldKeyword.toLowerCase()));
+          if (idx === -1) return [];
+          return rows.slice(-count).map(r => parseFloat(r.c[idx]?.v) || 0);
+        };
 
-          const box = document.createElement('div');
-          box.className = 'data-box';
-          
-          if (h.toUpperCase().includes("METAR")) {
-            box.innerHTML = `<div class="data-label">${h}</div><div class="data-value metar-text">${displayVal}</div>`;
-          } else if (h.includes("Wind Dir")) {
-            box.innerHTML = `<div class="data-label">${h}</div><div class="wind-rose-container"><div class="wind-arrow" style="transform: translate(-50%, 0) rotate(${windDir}deg)"></div></div><div class="data-value">${displayVal}°</div>`;
-          } else {
-            box.innerHTML = `<div class="data-label">${h}</div><div class="data-value">${displayVal}</div>`;
-          }
-          grid.appendChild(box);
-        });
+        // Extract key metrics
+        const metarData = getVal("METAR");
+        const windSpeed = getVal("Wind Speed");
+        const windDir = getVal("Wind Dir");
+        const maxWindSpeed = getVal("Max Wind Speed");
+        const visibility = getVal("Visibility");
+        const temp = getVal("Temp (C)");
+        const dewPoint = getVal("Dew Point");
+        const heatIndex = getVal("Heat Index");
+        const precip = getVal("Precip");
+        const cloudLayers = getVal("Cloud Layers");
+        const ceilometer = getVal("Ceilometer");
+        const humidity = getVal("Relative Humidity");
+        const altimeter = getVal("Altimeter");
+        const stationPress = getVal("Station Pressure");
+        const elevation = getVal("Elevation");
+        const pressureAlt = getVal("Pressure Alt");
+        const densityAlt = getVal("Density Alt");
+        const lightningDist = getVal("Lightning Distance");
+        const voltage = getVal("Voltage");
 
-        // Generate QNH (hPa) Card derived from Altimeter setting
-        let qnhDisplay = '--';
-        if (altimeterInHg && !isNaN(altimeterInHg)) {
-          qnhDisplay = (altimeterInHg * 33.8639).toFixed(1) + ' hPa';
+        // Calculate QNH hPa
+        let qnhValue = '--';
+        if (altimeter.raw) {
+          qnhValue = (altimeter.raw * 33.8639).toFixed(1) + ' hPa';
         }
 
-        const qnhBox = document.createElement('div');
-        qnhBox.className = 'data-box';
-        qnhBox.innerHTML = `<div class="data-label">QNH (HPA)</div><div class="data-value">${qnhDisplay}</div>`;
-        grid.appendChild(qnhBox);
+        // Map Header Status Values
+        const rainRate = precip.raw;
+        const voltageVal = voltage.raw;
+        const solar = getVal("Solar").raw;
+
+        const grid = document.getElementById('operator-grid');
+        grid.innerHTML = `
+          <!-- Decoded & Raw METAR Hero Card -->
+          <div class="card-hero-metar">
+            <div class="metar-header">
+              <span><i data-lucide="file-text" style="width:14px;"></i> Decoded & Raw METAR</span>
+              <span style="background:#0284c7; color:#fff; padding:2px 6px; border-radius:4px; font-size:0.65rem;">AUTO</span>
+            </div>
+            <div class="metar-split">
+              <div class="metar-decoded">
+                <div>Winds: <span>${windDir.display}° at ${windSpeed.display} KT</span></div>
+                <div>Vis: <span>${visibility.display} SM</span></div>
+                <div>Temp/Dew: <span>${temp.display}°C / ${dewPoint.display}°C</span></div>
+                <div>QNH / Alt: <span>${qnhValue} / ${altimeter.display} inHg</span></div>
+              </div>
+              <div class="metar-raw-box">${metarData.display}</div>
+            </div>
+          </div>
+
+          <!-- Wind Speed Card -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="wind" style="width:14px;"></i> Wind Speed (KT)</div>
+            <div class="op-card-val">${windSpeed.display}</div>
+            <div class="sparkline-container"><canvas id="spark-wind"></canvas></div>
+          </div>
+
+          <!-- Wind Dir Compass Card -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="compass" style="width:14px;"></i> Wind Dir</div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:5px;">
+              <div class="compass-box">
+                <div class="compass-arrow" style="transform: rotate(${windDir.raw}deg)"></div>
+                <div class="compass-center"></div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:1.4rem; font-weight:800;">${windDir.display}°</div>
+                <div class="op-card-sub">Max: ${maxWindSpeed.display} KT</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visibility Card -->
+          <div class="op-card ${visibility.raw < 1 ? 'alert-bg' : ''}">
+            <div class="op-card-title"><i data-lucide="eye" style="width:14px;"></i> Visibility (SM)</div>
+            <div class="op-card-val">${visibility.display}</div>
+            <div class="op-card-sub">${visibility.raw < 1 ? 'LOW VISIBILITY WARNING' : 'Normal Operations'}</div>
+          </div>
+
+          <!-- Precip Card -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="cloud-rain" style="width:14px;"></i> Precip (IN/HR)</div>
+            <div class="op-card-val">${precip.display}</div>
+            <div class="sparkline-container"><canvas id="spark-precip"></canvas></div>
+          </div>
+
+          <!-- Cloud Layers -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="cloud" style="width:14px;"></i> Cloud Layers</div>
+            <div class="op-card-val" style="font-size:1.3rem;">${cloudLayers.display}</div>
+            <div class="op-card-sub">Ceilometer Hits: ${ceilometer.display}</div>
+          </div>
+
+          <!-- Thermal Profile Card -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="thermometer" style="width:14px;"></i> Temp & Dew Point (°C)</div>
+            <div class="op-card-val">${temp.display}° / ${dewPoint.display}°</div>
+            <div class="sparkline-container"><canvas id="spark-temp"></canvas></div>
+          </div>
+
+          <!-- Heat Index Alert Card -->
+          <div class="op-card ${heatIndex.raw > 30 ? 'alert-bg' : ''}">
+            <div class="op-card-title"><i data-lucide="flame" style="width:14px;"></i> Heat Index (°C)</div>
+            <div class="op-card-val">${heatIndex.display}</div>
+            <div class="op-card-sub">${heatIndex.raw > 30 ? 'HIGH HEAT WARNING' : 'Optimal Zone'}</div>
+          </div>
+
+          <!-- QNH Translation Card -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="gauge" style="width:14px;"></i> QNH (HPA)</div>
+            <div class="op-card-val" style="color:#38bdf8;">${qnhValue}</div>
+            <div class="op-card-sub">Altimeter: ${altimeter.display} inHg</div>
+          </div>
+
+          <!-- Station Pressure Card -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="bar-chart-2" style="width:14px;"></i> Station Pressure</div>
+            <div class="op-card-val">${stationPress.display} <span style="font-size:0.8rem;">inHg</span></div>
+            <div class="sparkline-container"><canvas id="spark-press"></canvas></div>
+          </div>
+
+          <!-- Altitude Reference Card -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="mountain" style="width:14px;"></i> Altitude References</div>
+            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+              <div>
+                <div class="op-card-sub">Elev</div>
+                <div style="font-weight:bold; font-size:1.1rem;">${elevation.display} FT</div>
+              </div>
+              <div>
+                <div class="op-card-sub">Press Alt</div>
+                <div style="font-weight:bold; font-size:1.1rem;">${pressureAlt.display} FT</div>
+              </div>
+              <div>
+                <div class="op-card-sub">Dens Alt</div>
+                <div style="font-weight:bold; font-size:1.1rem;">${densityAlt.display} FT</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lightning Distance Card -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="zap" style="width:14px;"></i> Lightning Distance</div>
+            <div class="op-card-val">${lightningDist.display} <span style="font-size:0.8rem;">MI</span></div>
+            <div class="op-card-sub">Proximity Radar</div>
+          </div>
+
+          <!-- System Diagnostics Card -->
+          <div class="op-card">
+            <div class="op-card-title"><i data-lucide="activity" style="width:14px;"></i> System Health</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+              <div>
+                <div class="op-card-sub">Supply Voltage</div>
+                <div style="font-weight:bold; font-size:1.2rem; color:#22c55e;">${voltage.display} V</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="op-card-sub">Status</div>
+                <div style="font-weight:bold; font-size:1rem; color:#38bdf8;">OK</div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        lucide.createIcons();
+
+        // Render Sparklines
+        createSparkline("spark-wind", getHistory("Wind Speed"), "#38bdf8");
+        createSparkline("spark-precip", getHistory("Precip"), "#60a5fa");
+        createSparkline("spark-temp", getHistory("Temp (C)"), "#f97316");
+        createSparkline("spark-press", getHistory("Altimeter"), "#a855f7");
 
         // Update map stats
-        document.getElementById('map-temp').innerText = temp;
-        document.getElementById('map-wind').innerText = windSpeed;
-        document.getElementById('map-humidity').innerText = humidity;
+        document.getElementById('map-temp').innerText = temp.display;
+        document.getElementById('map-wind').innerText = windSpeed.display;
+        document.getElementById('map-humidity').innerText = humidity.display;
 
-        // Update map if initialized
         if (map) {
           map.setView([currentLat, currentLng], 13);
-          if (stationMarker) {
-            stationMarker.setLatLng([currentLat, currentLng]);
-          }
+          if (stationMarker) stationMarker.setLatLng([currentLat, currentLng]);
         }
-
         updateMapMarker();
 
         const toggleIcon = (id, active, className) => {
@@ -461,9 +733,9 @@
           else { el.classList.remove('active'); el.classList.remove(className); }
         };
 
-        toggleIcon('icon-hot', heatIndex > 30, 'hot');
+        toggleIcon('icon-hot', heatIndex.raw > 30, 'hot');
         toggleIcon('icon-rain', rainRate > 0, 'rain');
-        toggleIcon('icon-battery', voltage > 5.0, 'battery');
+        toggleIcon('icon-battery', voltageVal > 5.0, 'battery');
         toggleIcon('icon-cloud', solar < 200 && (new Date().getHours() > 6 && new Date().getHours() < 18), null);
         
         ['Image_Cam1', 'Image_Cam2', 'Image_Cam3', 'Image_Cam4'].forEach((id, index) => {
@@ -471,6 +743,7 @@
           if (colIdx !== -1) document.getElementById(`img-cam${index+1}`).src = processImageUrl(latestRow[colIdx]?.v || '');
         });
 
+        // Charts Section
         const chartsContainer = document.getElementById('charts-container');
         chartsContainer.innerHTML = '';
 
@@ -496,7 +769,7 @@
             datasets.push({
               label: fieldName,
               data: lastData.map(r => r.c[colIdx]?.v || null),
-              borderColor: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'][datasets.length % 5],
+              borderColor: ['#38bdf8', '#f97316', '#22c55e', '#eab308', '#a855f7'][datasets.length % 5],
               backgroundColor: 'transparent',
               borderWidth: 2,
               pointRadius: 0,
@@ -508,7 +781,7 @@
           if (datasets.length === 0) return;
           const chartBox = document.createElement('div');
           chartBox.className = 'chart-box';
-          chartBox.innerHTML = `<h3>${title}</h3><div style="height:300px;"><canvas></canvas>`;
+          chartBox.innerHTML = `<h3 style="color:#fff; margin-top:0;">${title}</h3><div style="height:300px;"><canvas></canvas></div>`;
           chartsContainer.appendChild(chartBox);
 
           new Chart(chartBox.querySelector('canvas'), {
@@ -518,9 +791,9 @@
               responsive: true, maintainAspectRatio: false,
               interaction: { mode: 'index', intersect: false },
               scales: {
-                x: { ticks: { maxTicksLimit: 12, font: { size: 10 } } },
-                y: { type: 'linear', display: true, position: 'left', title: { display: true, text: seenUnits[0] || '' } },
-                y1: { type: 'linear', display: seenUnits.length > 1, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: seenUnits[1] || '' } }
+                x: { ticks: { maxTicksLimit: 12, font: { size: 10 }, color: '#94a3b8' }, grid: { color: '#334155' } },
+                y: { type: 'linear', display: true, position: 'left', ticks: { color: '#94a3b8' }, grid: { color: '#334155' }, title: { display: true, text: seenUnits[0] || '', color: '#94a3b8' } },
+                y1: { type: 'linear', display: seenUnits.length > 1, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#94a3b8' }, title: { display: true, text: seenUnits[1] || '', color: '#94a3b8' } }
               }
             }
           });
