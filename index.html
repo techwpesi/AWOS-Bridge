@@ -90,14 +90,45 @@
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* Data Presentation */
-    .data-grid-30 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-    .data-box { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: center; }
+    /* Uniform Data Grid */
+    .data-grid-30 { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+      grid-auto-rows: 1fr;
+      gap: 15px; 
+    }
+    
+    .data-box { 
+      background: #fff; 
+      border: 1px solid #e0e0e0; 
+      border-radius: 12px; 
+      padding: 15px; 
+      text-align: center; 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      box-sizing: border-box;
+      min-height: 140px;
+    }
+    
     .data-label { font-size: 0.65rem; color: #95a5a6; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
-    .data-value { font-size: 1.4rem; color: var(--primary-dark); font-weight: 800; }
+    .data-value { font-size: 1.4rem; color: var(--primary-dark); font-weight: 800; word-break: break-word; }
 
-    .wind-rose-container { width: 50px; height: 50px; margin: 10px auto; position: relative; border: 2px solid #f0f0f0; border-radius: 50%; }
-    .wind-arrow { position: absolute; top: 50%; left: 50%; width: 3px; height: 25px; background: #e74c3c; margin-left: -1.5px; margin-top: -20px; transform-origin: bottom center; transition: transform 0.3s; }
+    /* Custom sizing for METAR to maintain uniform card dimensions */
+    .data-value.metar-text {
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.3;
+      max-height: 90px;
+      overflow-y: auto;
+      width: 100%;
+      color: #2c3e50;
+    }
+
+    .wind-rose-container { width: 40px; height: 40px; margin: 5px auto; position: relative; border: 2px solid #f0f0f0; border-radius: 50%; }
+    .wind-arrow { position: absolute; top: 50%; left: 50%; width: 3px; height: 20px; background: #e74c3c; margin-left: -1.5px; margin-top: -16px; transform-origin: bottom center; transition: transform 0.3s; }
     .wind-arrow::after { content: ''; position: absolute; top: 0; left: -4.5px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #e74c3c; }
 
     .images-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
@@ -354,7 +385,7 @@
         const rawTs = latestRow[tsIdx]?.f || latestRow[tsIdx]?.v || '--';
         document.getElementById('header-ts').innerText = toManilaTime(rawTs);
 
-        // Extract Latitude and Longitude from Google Sheet - EXACT MATCH
+        // Extract Latitude and Longitude from Google Sheet
         const latIdx = headers.findIndex(h => h && h.trim() === 'Lat');
         const lngIdx = headers.findIndex(h => h && h.trim() === 'Lon');
 
@@ -368,6 +399,7 @@
         
         let heatIndex = 0, rainRate = 0, voltage = 0, windDir = 0, solar = 0;
         let temp = '--', windSpeed = '--', humidity = '--';
+        let altimeterInHg = null;
 
         headers.forEach((h, i) => {
           if (!h || h.toLowerCase().includes("timestamp") || h.toLowerCase().startsWith("image") || h.trim() === "Lat" || h.trim() === "Lon") return;
@@ -382,11 +414,14 @@
           if (h.includes("Temp (C)")) temp = displayVal;
           if (h.includes("Wind Speed")) windSpeed = displayVal;
           if (h.includes("Relative Humidity")) humidity = displayVal;
+          if (h.toLowerCase().includes("altimeter")) altimeterInHg = parseFloat(val);
 
           const box = document.createElement('div');
           box.className = 'data-box';
           
-          if (h.includes("Wind Dir")) {
+          if (h.toUpperCase().includes("METAR")) {
+            box.innerHTML = `<div class="data-label">${h}</div><div class="data-value metar-text">${displayVal}</div>`;
+          } else if (h.includes("Wind Dir")) {
             box.innerHTML = `<div class="data-label">${h}</div><div class="wind-rose-container"><div class="wind-arrow" style="transform: translate(-50%, 0) rotate(${windDir}deg)"></div></div><div class="data-value">${displayVal}°</div>`;
           } else {
             box.innerHTML = `<div class="data-label">${h}</div><div class="data-value">${displayVal}</div>`;
@@ -394,12 +429,23 @@
           grid.appendChild(box);
         });
 
+        // Generate QNH (hPa) Card derived from Altimeter setting
+        let qnhDisplay = '--';
+        if (altimeterInHg && !isNaN(altimeterInHg)) {
+          qnhDisplay = (altimeterInHg * 33.8639).toFixed(1) + ' hPa';
+        }
+
+        const qnhBox = document.createElement('div');
+        qnhBox.className = 'data-box';
+        qnhBox.innerHTML = `<div class="data-label">QNH (HPA)</div><div class="data-value">${qnhDisplay}</div>`;
+        grid.appendChild(qnhBox);
+
         // Update map stats
         document.getElementById('map-temp').innerText = temp;
         document.getElementById('map-wind').innerText = windSpeed;
         document.getElementById('map-humidity').innerText = humidity;
 
-        // Update map if it exists and recreate marker with new coordinates
+        // Update map if initialized
         if (map) {
           map.setView([currentLat, currentLng], 13);
           if (stationMarker) {
